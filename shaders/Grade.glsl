@@ -22,6 +22,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
       else
          result = vec3(0.0);
 
+
       // White Balance Pre (adjust tint & temp of white point)
       vec3 x_whitePoint = s_whitePoint;
       vec3 t_whitepoint = vec3(x_whitePoint.r -= (tint * ONE_THIRD) + (temp * 0.5),

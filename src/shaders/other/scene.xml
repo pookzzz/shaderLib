@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Plane9Scene FormatVersion="2" Id="a0axsovk" ParentId="" WarmupTime="0" SceneType="2" Version="21" DevelopmentTime="0" Created="20110907 20:59" LastModified="20160404 20:34">
+	<Author>Joakim Dahl</Author>
+	<Desc>The face of sound</Desc>
+	<Tags></Tags>
+	<License Type="CC BY-NC-SA 3.0" RelicensingPossible="1">This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/3.0/</License>
+	<Nodes>
+		<Node Type="Screen" Name="Screen1">
+			<Port Id="Viewport" Value="0 0 1 1"/>
+			<Port Id="CamPos" Value="-0.0348046 0 -2.024"/>
+			<Port Id="CamRot" Value="0 0 0"/>
+			<Port Id="CamLookAt" Value="0 0 1"/>
+			<Port Id="CamLookAtInWorldSpace" Value="false"/>
+			<Port Id="CamFov" Value="45"/>
+			<Port Id="CamNear" Value="0.1"/>
+			<Port Id="CamFar" Value="1000"/>
+			<Port Id="ScaleByAspect" Value="false"/>
+		</Node>
+		<Node Type="Clear" Name="Clear1">
+			<Port Id="Color" Value="0 0 0 1"/>
+		</Node>
+		<Node Type="RenderObject" Name="RenderObject1">
+			<Port Id="Col" Value="1 1 1 1"/>
+			<Port Id="Pos" Value="0 -0.4 0"/>
+			<Port Id="Rot" Value="0 0 0"/>
+			<Port Id="Scale" Value="1 1 1"/>
+		</Node>
+		<Node Type="Oscilloscope" Name="Oscilloscope1">
+			<Port Id="NumLines" Value="576"/>
+			<Port Id="Color" Value="1 1 1 1"/>
+			<Port Id="Wave" Value="-0.0346127"/>
+		</Node>
+		<Node Type="Waveform" Name="Waveform1">
+			<Port Id="NoMusicLeft" Value="0"/>
+			<Port Id="NoMusicRight" Value="0"/>
+			<Port Id="NoMusicMono" Value="0"/>
+			<Port Id="Amplification" Value="1"/>
+		</Node>
+		<Node Type="Shader" Name="Shader1">
+			<Port Id="DepthTest" Value="true"/>
+			<Port Id="DepthWrite" Value="true"/>
+			<Port Id="SrcBlend" Value="1"/>
+			<Port Id="SrcAlphaBlend" Value="-1"/>
+			<Port Id="DstBlend" Value="0"/>
+			<Port Id="DstAlphaBlend" Value="-1"/>
+			<Port Id="CullMode" Value="2"/>
+			<Port Id="In1" Value="0 0 0"/>
+			<Port Id="In2" Value="0 0 0"/>
+			<Port Id="In3" Value="0 0 0"/>
+			<Port Id="Color1" Value="1 1 1 1"/>
+			<Port Id="Color2" Value="1 1 1 1"/>
+			<Port Id="Shader">
+				<Value>VERTEXOUTPUT
+{
+	vec4 diffuse;
+	vec2 tex;
+}
+
+#ifdef VERTEX
+void main() 
+{
+	vec4 v = iPosition;
+	v.y = (v.y*sin(v.x*PI+PI/2.0)+sin(v.x*PI+PI/2.0))*gIn1.x;
+	gl_Position	= gMVP * v;
+	so.tex		= iTexCoord;
+	so.diffuse	= iColor*gColor1*gColor;
+}
+#endif
+
+
+#ifdef FRAGMENT
+void main()
+{
+	vec2 p = si.tex * vec2(2.0) - vec2(1.0);
+	// oColor = texture(gTexture1, si.tex)*si.diffuse;
+	oColor = (si.diffuse);
+}
+#endif
+</Value>
+			</Port>
+			<Port Id="RandomSeed" Value="1"/>
+			<Port Id="Expression">
+				<Value>in1.x = beat(0)*1;</Value>
+			</Port>
+		</Node>
+		<Node Type="Transform" Name="Transform1">
+			<Port Id="Pos" Value="0 0 0"/>
+			<Port Id="Rot" Value="0 0 0"/>
+			<Port Id="Scale" Value="1 1 1"/>
+			<Port Id="Color" Value="1 1 1 1"/>
+		</Node>
+		<Node Type="Oscilloscope" Name="Oscilloscope2">
+			<Port Id="NumLines" Value="576"/>
+			<Port Id="Color" Value="1 1 1 1"/>
+			<Port Id="Wave" Value="0.291904"/>
+		</Node>
+		<Node Type="Shader" Name="Shader2">
+			<Port Id="DepthTest" Value="true"/>
+			<Port Id="DepthWrite" Value="true"/>
+			<Port Id="SrcBlend" Value="1"/>
+			<Port Id="SrcAlphaBlend" Value="-1"/>
+			<Port Id="DstBlend" Value="0"/>
+			<Port Id="DstAlphaBlend" Value="-1"/>
+			<Port Id="CullMode" Value="2"/>
+			<Port Id="In1" Value="0 0 0"/>
+			<Port Id="In2" Value="0 0 0"/>
+			<Port Id="In3" Value="0 0 0"/>
+			<Port Id="Color1" Value="1 1 1 1"/>
+			<Port Id="Color2" Value="1 1 1 1"/>
+			<Port Id="Shader">
+				<Value>VERTEXOUTPUT
+{
+	vec4 diffuse;
+	vec2 tex;
+}
+
+#ifdef VERTEX
+void main() 
+{
+	vec4 v = iPosition;
+	v.y = (v.y*sin(v.x*PI+PI/2.0)-sin(v.x*PI+PI/2.0))*gIn1.x;
+	gl_Position	= gMVP * v;
+	so.tex		= iTexCoord;
+	so.diffuse	= iColor*gColor1*gColor;
+}
+#endif
+
+
+#ifdef FRAGMENT
+void main()
+{
+	vec2 p = si.tex * vec2(2.0) - vec2(1.0);
+	// oColor = texture(gTexture1, si.tex)*si.diffuse;
+	oColor = (si.diffuse);
+}
+#endif
+</Value>
+			</Port>
+			<Port Id="RandomSeed" Value="1"/>
+			<Port Id="Expression">
+				<Value>in1.x = beat(0)*1;</Value>
+			</Port>
+		</Node>
+		<Node Type="RenderObject" Name="RenderObject2">
+			<Port Id="Col" Value="1 1 1 1"/>
+			<Port Id="Pos" Value="0 0.3 0"/>
+			<Port Id="Rot" Value="0 0 0"/>
+			<Port Id="Scale" Value="1 1 1"/>
+		</Node>
+		<Node Type="MeshObject" Name="MeshObject1"/>
+		<Node Type="Shader" Name="Shader3">
+			<Port Id="DepthTest" Value="false"/>
+			<Port Id="DepthWrite" Value="false"/>
+			<Port Id="SrcBlend" Value="1"/>
+			<Port Id="SrcAlphaBlend" Value="-1"/>
+			<Port Id="DstBlend" Value="1"/>
+			<Port Id="DstAlphaBlend" Value="-1"/>
+			<Port Id="CullMode" Value="0"/>
+			<Port Id="In1" Value="0 0 0"/>
+			<Port Id="In2" Value="0 0 0"/>
+			<Port Id="In3" Value="0 0 0"/>
+			<Port Id="Color1" Value="1 1 1 1"/>
+			<Port Id="Color2" Value="1 1 1 1"/>
+			<Port Id="Shader">
+				<Value>VERTEXOUTPUT
+{
+	vec4 diffuse;
+	vec2 tex;
+}
+
+#ifdef VERTEX
+void main() 
+{
+	gl_Position	= ( gMVP * iPosition);
+	so.tex		= iTexCoord;
+	so.diffuse	= iColor*gColor1*gColor;
+}
+#endif
+
+
+#ifdef FRAGMENT
+void main()
+{
+	vec2 p = si.tex * vec2(2.0) - vec2(1.0);
+	// oColor = texture(gTexture1, si.tex)*si.diffuse;
+	float l = length(p);
+	oColor = (si.diffuse*smoothstep(1.0,0.6,pow(l,2.0))*smoothstep(0.3*gIn1.x,0.1+0.3*gIn1.x,length(p-gIn2.xy)));
+}
+#endif
+</Value>
+			</Port>
+			<Port Id="RandomSeed" Value="1"/>
+			<Port Id="Expression">
+				<Value>perm = perm + ((band(-1, 0, 0, 0.1)*2+0.01)*deltatime);
+t = perm + permrand*10;
+in1.x = beat(0)*5;
+in2.x = noise2(t,0)*0.2;
+in2.y = noise2(t,1)*0.2;
+</Value>
+			</Port>
+		</Node>
+		<Node Type="Disc" Name="Disc1">
+			<Port Id="OuterRadius" Value="0.2"/>
+			<Port Id="InnerRadius" Value="0"/>
+			<Port Id="NumSegments" Value="32"/>
+			<Port Id="DoubleSided" Value="false"/>
+			<Port Id="Phase" Value="0"/>
+			<Port Id="ScaleU" Value="1"/>
+			<Port Id="ScaleV" Value="1"/>
+		</Node>
+		<Node Type="Clone" Name="Clone1">
+			<Port Id="NumClones" Value="2"/>
+			<Port Id="Pos" Value="0 0 0"/>
+			<Port Id="Rot" Value="0 0 0"/>
+			<Port Id="Scale" Value="1 1 1"/>
+			<Port Id="PosChange" Value="0.7 0 0"/>
+			<Port Id="RotChange" Value="0 0 0"/>
+			<Port Id="ScaleChange" Value="0 0 0"/>
+			<Port Id="Color" Value="1 1 1 1"/>
+			<Port Id="Center" Value="true"/>
+		</Node>
+		<Node Type="Vector" Name="Vector1">
+			<Port Id="x" Value="-0.0348046"/>
+			<Port Id="y" Value="0"/>
+			<Port Id="z" Value="-2.024"/>
+		</Node>
+		<Node Type="Expression" Name="Expression1">
+			<Port Id="In1" Value="0"/>
+			<Port Id="In2" Value="0"/>
+			<Port Id="In3" Value="0"/>
+			<Port Id="In4" Value="0"/>
+			<Port Id="In5" Value="0"/>
+			<Port Id="RandomSeed" Value="1"/>
+			<Port Id="Expression">
+				<Value>out1=noise1(time*0.05+permrand*10.0)*0.3</Value>
+			</Port>
+		</Node>
+	</Nodes>
+	<Connections>
+		<Connection Out="RenderObject2.Render" In="Screen1.Render"/>
+		<Connection Out="Vector1.Vector" In="Screen1.CamPos"/>
+		<Connection Out="Clear1.Render" In="RenderObject1.Render"/>
+		<Connection Out="Transform1.Object" In="RenderObject1.Object"/>
+		<Connection Out="Waveform1.RightChannel" In="Oscilloscope1.Wave"/>
+		<Connection Out="Shader1.Effect" In="Oscilloscope1.Effect"/>
+		<Connection Out="Oscilloscope1.Object" In="Transform1.Object1"/>
+		<Connection Out="Oscilloscope2.Object" In="Transform1.Object2"/>
+		<Connection Out="Waveform1.LeftChannel" In="Oscilloscope2.Wave"/>
+		<Connection Out="Shader2.Effect" In="Oscilloscope2.Effect"/>
+		<Connection Out="RenderObject1.Render" In="RenderObject2.Render"/>
+		<Connection Out="Clone1.Object" In="RenderObject2.Object"/>
+		<Connection Out="Shader3.Effect" In="MeshObject1.Effect"/>
+		<Connection Out="Disc1.Mesh" In="MeshObject1.Mesh"/>
+		<Connection Out="MeshObject1.Object" In="Clone1.Object"/>
+		<Connection Out="Expression1.Out1" In="Vector1.x"/>
+	</Connections>
+	<SceneCompatibility>
+		<GoodScenes/>
+		<BadScenes>
+			<Scene Name="Kaleidoscope"/>
+			<Scene Name="MirrorCube"/>
+			<Scene Name="MirrorTunnel"/>
+			<Scene Name="AbstractClouds"/>
+			<Scene Name="ColorBlob"/>
+		</BadScenes>
+	</SceneCompatibility>
+</Plane9Scene>

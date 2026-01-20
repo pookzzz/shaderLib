@@ -1,0 +1,136 @@
+// Created by inigo quilez - iq/2013
+// License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
+
+uniform float iTime;
+uniform vec3  iResolution;
+
+uniform vec2 paramPos;
+uniform float paramSpeed;
+uniform bool paramProcedural;
+
+// Added for Action camera
+uniform vec3  camera_position, camera_interest;
+uniform float camera_roll, camera_fov;
+uniform bool  camera_use;
+
+#define pi 3.1415926535897932384624433832795
+
+// hash based 3d value noise
+float hash(float n) {
+    return fract(sin(n) * 43758.5453);
+}
+
+float noise(in vec3 x) {
+    vec3 p = floor(x);
+    vec3 f = fract(x);
+    f = f * f * (3.0 - 2.0 * f);
+    float n = p.x + p.y * 57.0 + 113.0 * p.z;
+    return mix(
+        mix(mix(hash(n + 0.0), hash(n + 1.0), f.x),
+            mix(hash(n + 57.0), hash(n + 58.0), f.x), f.y),
+        mix(mix(hash(n + 113.0), hash(n + 114.0), f.x),
+            mix(hash(n + 170.0), hash(n + 171.0), f.x), f.y), f.z);
+}
+
+vec4 map(in vec3 p) {
+    float d = 0.2 - p.y;
+
+    vec3 q = p - vec3(1.0, 0.1, 0.0) * (iTime * paramSpeed / 1000.0);
+    float f;
+    f  = 0.5000 * noise(q); q = q * 2.02;
+    f += 0.2500 * noise(q); q = q * 2.03;
+    f += 0.1250 * noise(q); q = q * 2.01;
+    f += 0.0625 * noise(q);
+
+    d += 3.0 * f;
+    d = clamp(d, 0.0, 1.0);
+
+    vec4 res = vec4(d);
+    res.xyz = mix(1.15 * vec3(1.0, 0.95, 0.8), vec3(0.7, 0.7, 0.7), res.x);
+    return res;
+}
+
+vec3 sundir = vec3(-1.0, 0.0, 0.0);
+
+vec4 raymarch(in vec3 ro, in vec3 rd) {
+    vec4 sum = vec4(0, 0, 0, 0);
+
+    float t = 0.0;
+    for (int i = 0; i < 64; i++) {
+        if (sum.a > 0.99) continue;
+
+        vec3 pos = ro + t * rd;
+        vec4 col = map(pos);
+
+        float dif = clamp((col.w - map(pos + 0.3 * sundir).w) / 0.6, 0.0, 1.0);
+        vec3 lin = vec3(0.65, 0.68, 0.7) * 1.35 + 0.45 * vec3(0.7, 0.5, 0.3) * dif;
+        col.xyz *= lin;
+
+        col.a *= 0.35;
+        col.rgb *= col.a;
+
+        sum = sum + col * (1.0 - sum.a);
+        t += max(0.1, 0.025 * t);
+    }
+
+    sum.xyz /= (0.001 + sum.w);
+    return clamp(sum, 0.0, 1.0);
+}
+
+// rotation matrix about axis
+mat4 rot(vec3 axis, float angle) {
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+
+    return mat4(
+        oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,  0.0,
+        oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,  0.0,
+        oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c,           0.0,
+        0.0,                                0.0,                                0.0,                                1.0);
+}
+
+float deg2rad(float angle) {
+    return (angle / (180.0 / pi));
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    vec2 res = iResolution.xy;
+    vec2 q = fragCoord.xy / res;
+    vec2 p = -1.0 + 2.0 * q;
+    p.x *= res.x / res.y;
+    vec2 mo = -1.0 + 2.0 * paramPos.xy;
+
+    vec3 ro, rd;
+    if (camera_use) {
+        vec3 camera_position_r = camera_position * vec3(-1.0, 1.0, 1.0);
+        vec3 camera_interest_r = camera_interest * vec3(-1.0, 1.0, 1.0);
+        vec3 camera_direction = normalize(camera_interest_r - camera_position_r);
+        vec3 camera_up = (vec4(0.0, 1.0, 0.0, 0.0) * rot(camera_direction, deg2rad(camera_roll))).xyz;
+        vec3 camera_right = cross(camera_direction, camera_up);
+        camera_up = cross(camera_right, camera_direction);
+        p *= tan(deg2rad(camera_fov / 2.0));
+        vec3 image_point = -p.x * camera_right + p.y * camera_up + camera_position_r + camera_direction;
+        rd = normalize(image_point - camera_position_r);
+        ro = camera_position_r;
+    } else {
+        ro = 4.0 * normalize(vec3(cos(2.75 - 3.0 * mo.x), 0.7 + (mo.y + 1.0), sin(2.75 - 3.0 * mo.x)));
+        vec3 ta = vec3(0.0, 1.0, 0.0);
+        vec3 ww = normalize(ta - ro);
+        vec3 uu = normalize(cross(vec3(0.0, 1.0, 0.0), ww));
+        vec3 vv = normalize(cross(ww, uu));
+        rd = normalize(p.x * uu + p.y * vv + 1.5 * ww);
+    }
+
+    vec4 resCol = raymarch(ro, rd);
+
+    float sun = clamp(dot(sundir, rd), 0.0, 1.0);
+    vec3 col = vec3(0.6, 0.71, 0.75) - rd.y * 0.2 * vec3(1.0, 0.5, 1.0) + 0.15 * 0.5;
+    col += 0.2 * vec3(1.0, .6, 0.1) * pow(sun, 8.0);
+    col *= 0.95;
+    col = mix(col, resCol.xyz, resCol.w);
+    col += 0.1 * vec3(1.0, 0.4, 0.2) * pow(sun, 3.0);
+
+    fragColor = vec4(col, 1.0);
+}
