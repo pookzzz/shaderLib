@@ -5,9 +5,13 @@ uniform vec3      iResolution;
 uniform float     paramSpeed;
 
 const float pi = 3.14159;
-float timeVal = 15.0 + iTime * paramSpeed / 100.0;
+
+float getTimeVal() {
+    return 15.0 + iTime * paramSpeed / 100.0;
+}
 
 vec4 mapFunc(in vec3 pos) {
+    float timeVal = getTimeVal();
     vec3 pn = normalize(pos);
 
     vec2 texC = vec2(0.0);
@@ -100,6 +104,7 @@ float calcAO(in vec3 pos, in vec3 nor) {
 }
 
 vec3 render(in vec3 ro, in vec3 rd, in vec2 p) {
+    float timeVal = getTimeVal();
     vec4 res = castRay(ro, rd, 20.0);
     float t = res.w;
     vec3 m = res.xyz;

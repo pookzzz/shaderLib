@@ -52,7 +52,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     v.x *= res.x / res.y;
 
     vec3 org = vec3(0.0, -2.0, 4.0);
-    vec3 dir = normalize(vec3(v.x * paramFlameDirection.x, -v.y, paramFlameDirection.y));
+    vec3 dir = normalize(vec3(v.x * paramFlameDirection.x, -v.y, -paramFlameDirection.y));
     vec4 p = Raymarche(org, dir);
     float glow = p.w;
 

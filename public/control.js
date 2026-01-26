@@ -20,6 +20,15 @@ const canvas = document.getElementById('glcanvas');
 let canvasMode = 'window';
 let imageSize = null;
 
+const AVAILABLE_CHANNEL_URLS = [
+   "/assets/0000.jpeg",
+   "/assets/Soft.png",
+   "/assets/cover.png",
+   "/assets/danny.png",
+   "/assets/default.png",
+   "/assets/skull.png",
+];
+
 function detectImageSize(passes) {
    for (const pass of passes) {
       if (pass.channels && pass.channels.length) {
@@ -143,6 +152,44 @@ async function createControls(passes) {
       title.style.paddingBottom = '5px';
       group.appendChild(title);
 
+      if (pass.channels && Array.isArray(pass.channels) && pass.channels.length) {
+         pass.channels.forEach((channel, chIndex) => {
+            const chGroup = document.createElement('div');
+            chGroup.className = 'control-group';
+
+            const chLabel = document.createElement('label');
+            const channelName = channel.url || '';
+            chLabel.textContent = 'Channel ' + chIndex + ' ' + channelName;
+            chGroup.appendChild(chLabel);
+
+            const select = document.createElement('select');
+
+            const urls = Array.from(new Set(
+               (AVAILABLE_CHANNEL_URLS || [])
+                  .concat(channel.url || [])
+                  .filter(Boolean)
+            ));
+
+            urls.forEach(u => {
+               const opt = document.createElement('option');
+               opt.value = u;
+               opt.textContent = u.replace('/assets/', '');
+               if (u === channel.url) opt.selected = true;
+               select.appendChild(opt);
+            });
+
+            select.onchange = (e) => {
+               channel.url = e.target.value;
+               if (typeof loadShader === 'function' && typeof currentShaderId !== 'undefined') {
+                  loadShader(currentShaderId);
+               }
+            };
+
+            chGroup.appendChild(select);
+            group.appendChild(chGroup);
+         });
+      }
+
       for (const [key, uniform] of Object.entries(uniforms)) {
          const controlGroup = document.createElement('div');
          controlGroup.className = 'control-group';
@@ -198,27 +245,33 @@ async function createControls(passes) {
             controlGroup.appendChild(row);
 
          } else if (uniform.type === '1i') {
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.step = '1';
-            input.value = uniform.value;
-            input.oninput = (e) => {
-               uniform.value = parseInt(e.target.value, 10);
-            };
-            controlGroup.appendChild(input);
+            const isBooleanLike = /premultiplied|camera_use|use|enabled|enable|warp|procedural|move|modulation/i.test(key);
 
-         } else if (uniform.type === '3f') {
+            if (isBooleanLike) {
+               const toggle = document.createElement('input');
+               toggle.type = 'checkbox';
+               toggle.checked = !!uniform.value;
+               toggle.onchange = (e) => {
+                  uniform.value = e.target.checked ? 1 : 0;
+               };
+               controlGroup.appendChild(toggle);
+            } else {
+               const input = document.createElement('input');
+               input.type = 'number';
+               input.step = '1';
+               input.value = uniform.value;
+               input.oninput = (e) => {
+                  uniform.value = parseInt(e.target.value, 10);
+               };
+               controlGroup.appendChild(input);
+            }
+
+         } else if (uniform.type === '2f' || uniform.type === 'vec2') {
             const row = document.createElement('div');
             row.className = 'vec3-container';
 
-            const color = document.createElement('input');
-            color.type = 'color';
-            color.value = vec3ToHex(uniform.value);
-            row.appendChild(color);
-
-            const numberInputs = [];
-
-            [0, 1, 2].forEach(i => {
+            const inputs = [];
+            [0, 1].forEach(i => {
                const input = document.createElement('input');
                input.type = 'number';
                input.step = '0.01';
@@ -226,21 +279,63 @@ async function createControls(passes) {
                input.oninput = (e) => {
                   const f = parseFloat(e.target.value);
                   uniform.value[i] = f;
-                  color.value = vec3ToHex(uniform.value);
                };
-               numberInputs.push(input);
+               inputs.push(input);
                row.appendChild(input);
             });
 
-            color.oninput = (e) => {
-               const v = hexToVec3(e.target.value);
-               uniform.value[0] = v[0];
-               uniform.value[1] = v[1];
-               uniform.value[2] = v[2];
-               numberInputs.forEach((input, i) => {
-                  input.value = uniform.value[i].toFixed(2);
+            controlGroup.appendChild(row);
+
+         } else if (uniform.type === '3f' || uniform.type === 'vec3') {
+            const row = document.createElement('div');
+            row.className = 'vec3-container';
+
+            const isColorLike = /color|whitepoint|blackpoint|rgb|tint/i.test(key);
+
+            if (isColorLike) {
+               const color = document.createElement('input');
+               color.type = 'color';
+               color.value = vec3ToHex(uniform.value);
+               row.appendChild(color);
+
+               const numberInputs = [];
+
+               [0, 1, 2].forEach(i => {
+                  const input = document.createElement('input');
+                  input.type = 'number';
+                  input.step = '0.01';
+                  input.value = uniform.value[i];
+                  input.oninput = (e) => {
+                     const f = parseFloat(e.target.value);
+                     uniform.value[i] = f;
+                     color.value = vec3ToHex(uniform.value);
+                  };
+                  numberInputs.push(input);
+                  row.appendChild(input);
                });
-            };
+
+               color.oninput = (e) => {
+                  const v = hexToVec3(e.target.value);
+                  uniform.value[0] = v[0];
+                  uniform.value[1] = v[1];
+                  uniform.value[2] = v[2];
+                  numberInputs.forEach((input, i) => {
+                     input.value = uniform.value[i].toFixed(2);
+                  });
+               };
+            } else {
+               [0, 1, 2].forEach(i => {
+                  const input = document.createElement('input');
+                  input.type = 'number';
+                  input.step = '0.01';
+                  input.value = uniform.value[i];
+                  input.oninput = (e) => {
+                     const f = parseFloat(e.target.value);
+                     uniform.value[i] = f;
+                  };
+                  row.appendChild(input);
+               });
+            }
 
             controlGroup.appendChild(row);
          }

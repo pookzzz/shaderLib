@@ -11,7 +11,7 @@ uniform bool paramProcedural;
 // Added for Action camera
 uniform vec3  camera_position, camera_interest;
 uniform float camera_roll, camera_fov;
-uniform bool  camera_use;
+uniform int  camera_use;
 
 #define pi 3.1415926535897932384624433832795
 
@@ -103,7 +103,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 mo = -1.0 + 2.0 * paramPos.xy;
 
     vec3 ro, rd;
-    if (camera_use) {
+    if (camera_use == 1) {
         vec3 camera_position_r = camera_position * vec3(-1.0, 1.0, 1.0);
         vec3 camera_interest_r = camera_interest * vec3(-1.0, 1.0, 1.0);
         vec3 camera_direction = normalize(camera_interest_r - camera_position_r);

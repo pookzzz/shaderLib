@@ -114,7 +114,7 @@ const AK_ColorCompress = [
 const AK_Vibrance = [
    {
       name: "AK_Vibrance",
-      src: "/shaders/ak_vibrance.glsl",
+      src: "/shaders/Vibrance.glsl",
       size: "screen",
       screen: true,
       channels: [
@@ -136,7 +136,7 @@ const CPGP_Clouds = [
       channels: [],
       uniforms: {
          paramPos: { type: '2f', value: [0.5, 0.5] },
-         paramSpeed: { type: '1f', value: 1.0 },
+         paramSpeed: { type: '1f', value: 300.0 },
          paramProcedural: { type: '1i', value: 1 },
          camera_use: { type: '1i', value: 0 },
          camera_position: { type: '3f', value: [0.0, 0.0, 0.0] },
@@ -155,7 +155,7 @@ const CPGP_Fireball = [
       screen: true,
       channels: [],
       uniforms: {
-         paramFlameSpeed: { type: '1f', value: 1.0 },
+         paramFlameSpeed: { type: '1f', value: 50.0 },
       }
    }
 ];
@@ -168,7 +168,7 @@ const CPGP_Flame = [
       screen: true,
       channels: [],
       uniforms: {
-         paramFlameSpeed: { type: '1f', value: 1.0 },
+         paramFlameSpeed: { type: '1f', value: 50.0 },
          paramFlameDirection: { type: '2f', value: [1.0, 1.0] },
          paramColor1: { type: '3f', value: [1.0, 0.5, 0.1] },
          paramColor2: { type: '3f', value: [1.0, 1.0, 0.5] },
@@ -186,7 +186,7 @@ const CPGP_FractalCell = [
          { url: "/assets/Soft.png", wrap: "repeat", filter: "nearest", flipY: true },
       ],
       uniforms: {
-         paramSpeed: { type: '1f', value: 1.0 },
+         paramSpeed: { type: '1f', value: 50.0 },
          UseLigthModulation: { type: '1i', value: 0 },
       }
    }
@@ -203,7 +203,7 @@ const CPGP_PaleBlueDot = [
          { url: "/assets/cover.png", wrap: "repeat", filter: "nearest", flipY: true },
       ],
       uniforms: {
-         paramSpeed: { type: '1f', value: 1.0 },
+         paramSpeed: { type: '1f', value: 50.0 },
       }
    }
 ];
@@ -216,7 +216,7 @@ const CPGP_Sin = [
       screen: true,
       channels: [],
       uniforms: {
-         paramSinSpeed: { type: '1f', value: 1.0 },
+         paramSinSpeed: { type: '1f', value: 50.0 },
          paramSinSPosX: { type: '1f', value: 0.0 },
       }
    }
@@ -233,7 +233,7 @@ const CPGP_TextureVortex = [
       ],
       uniforms: {
          paramPos: { type: '2f', value: [0.5, 0.5] },
-         paramSpeed: { type: '1f', value: 1.0 },
+         paramSpeed: { type: '1f', value: 50.0 },
          paramWaveSize: { type: '1f', value: 2.0 },
       }
    }
@@ -247,7 +247,7 @@ const CPGP_ParticuleFractale = [
       screen: true,
       channels: [],
       uniforms: {
-         paramSpeed: { type: '1f', value: 1.0 },
+         paramSpeed: { type: '1f', value: 3.0 },
          paramWarp: { type: '1i', value: 0 },
       }
    }
@@ -265,7 +265,7 @@ const CPGP_BasicLensflare = [
       uniforms: {
          paramDirection: { type: '2f', value: [0.5, 0.5] },
          paramMove: { type: '1i', value: 1 },
-         paramSpeed: { type: '1f', value: 1.0 },
+         paramSpeed: { type: '1f', value: 50.0 },
       }
    }
 ];
